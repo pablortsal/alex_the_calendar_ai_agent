@@ -1,0 +1,7 @@
+INTERNAL_DOCS.md
+credentials.json
+token.json
+alex_the_assistant_env/
+.DS_Store
+__pycache__/
+.env
