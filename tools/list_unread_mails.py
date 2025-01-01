@@ -1,19 +1,18 @@
 from tools.gmail_setup import get_gmail_service
 def list_unread_emails():
-    """Lista los correos no leídos en la bandeja de entrada"""
+    """List all unread emails from the inbox."""
     service = get_gmail_service()
     try:
-        # Busca correos no leídos en la bandeja de entrada
         results = service.users().messages().list(userId='me', labelIds=['INBOX'], q='is:unread').execute()
         messages = results.get('messages', [])
         
         if not messages:
-            print("No hay correos nuevos.")
+            print("No new mails")
             return []
         
-        print(f"Se encontraron {len(messages)} correos no leídos.")
+        print(f"Found {len(messages)} unread emails.")
         return messages
     except Exception as e:
-        print(f"Error al obtener correos no leídos: {e}")
+        print(f"Error while retriving unreads emails: {e}")
         return []
     

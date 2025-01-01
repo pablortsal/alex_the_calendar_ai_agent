@@ -3,7 +3,7 @@ import re
 from tools.gmail_setup import get_gmail_service
 
 def get_email_content(message_id):
-    """Obtiene y decodifica el contenido de un correo por su ID"""
+    """Get Email content from a given message_id."""
     service = get_gmail_service()
     try:
         message = service.users().messages().get(userId='me', id=message_id).execute()
@@ -12,7 +12,6 @@ def get_email_content(message_id):
         subject = ""
         sender = ""
 
-        # Obtener el asunto y el remitente del correo
         for header in headers:
             if header['name'] == 'Subject':
                 subject = header['value']
@@ -22,20 +21,19 @@ def get_email_content(message_id):
                 if email_match:
                     sender = email_match.group(1)
         
-        # Obtener el cuerpo del correo
         parts = payload.get('parts', [])
         body = ""
         for part in parts:
-            if part['mimeType'] == 'text/plain':  # Asegúrate de procesar solo texto plano
+            if part['mimeType'] == 'text/plain':  
                 body = part['body']['data']
-                body = base64.urlsafe_b64decode(body).decode('utf-8')  # Decodificar Base64
+                body = base64.urlsafe_b64decode(body).decode('utf-8') 
                 break
         
-        print(f"Asunto: {subject}")
-        print(f"De: {sender}")
-        print(f"Cuerpo: {body}")
+        print(f"Subject: {subject}")
+        print(f"From: {sender}")
+        print(f"Body: {body}")
         return subject, sender, body
     except Exception as e:
-        print(f"Error al obtener el contenido del correo: {e}")
+        print(f"Error while getting the email content: {e}")
         return None, None, None
     

@@ -6,16 +6,14 @@ from tools.reply_to_email import reply_to_email
 from tools.mark_email_as_read import mark_email_as_read
 from time import sleep
 from datetime import datetime, timedelta
-# new
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Cargar las variables de entorno desde el archivo .env
 load_dotenv()
 client = OpenAI(
-  api_key=api_key,  # this is also the default, it can be omitted
+  api_key=api_key,
 )
 
 
@@ -59,16 +57,13 @@ def interpret_email_with_gpt(email_body, conversation_history=""):
 
 def process_email(message_id, sender, subject, body, conversation_history=""):
     print(message_id, sender, subject, body)
-    """Procesa un correo usando GPT y ejecuta la acción adecuada"""
+    """Process an email and take action based on its content"""
     try:
-        # Interpretar el correo con GPT
         gpt_response = interpret_email_with_gpt(body, conversation_history)
         print("Respuesta de GPT:", gpt_response)
 
-        # Convertir la respuesta de GPT en un diccionario
         response_data = eval(gpt_response)
         print("Datos de respuesta:", response_data)
-        # Ejecutar la acción según la respuesta de GPT
         if response_data["action"] == "schedule_meeting":
             # Crear la reunión
             meeting_details = response_data["details"]
@@ -103,12 +98,11 @@ def process_email(message_id, sender, subject, body, conversation_history=""):
         print(f"Error al procesar el correo: {e}")
 
 def process_unread_emails():
-    """Lee correos no leídos y los procesa uno por uno"""
+    """Read and process all unread emails."""
     messages = list_unread_emails()
     if not messages:
         return
 
-    # Mantener historial de la conversación
     conversation_history = ""
 
     for message in messages:
@@ -116,23 +110,21 @@ def process_unread_emails():
         subject, sender, body = get_email_content(message_id)
 
         if sender and body:
-            print(f"Procesando correo de {sender} con asunto '{subject}'...")
-            # Actualizar el historial de la conversación
+            print(f"Proccesing mail from {sender} with subject '{subject}'...")
             conversation_history += f"\nDe: {sender}\n{body}\n"
             process_email(message_id, sender, subject, body, conversation_history)
 
-        # Marca el correo como leído después de procesarlo
         mark_email_as_read(message_id)
 
 if __name__ == "__main__":
-    print("Iniciando el agente para procesar correos no leídos...")
+    print("Initializing agent...")
     while True:
         try:
             process_unread_emails()
             sleep(60)  # Revisa los correos cada minuto
         except KeyboardInterrupt:
-            print("Agente detenido.")
+            print("Agent stopped.")
             break
         except Exception as e:
-            print(f"Error en el agente: {e}")
+            print(f"Agent Error: {e}")
             sleep(60)  # Espera un minuto antes de intentar de nuevo
